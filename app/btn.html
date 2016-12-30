@@ -1,0 +1,13 @@
+<btn>
+  <button class="p:10px-50px fs:120pc bg:white bd:0 m:10px ol:n" onclick={clickEvent}>{opts.greeting} {clickCount || ''}</button>
+  
+  <script>
+    this.clickCount = 0;
+    
+    this.clickEvent = (e) =>{
+  	  this.clickCount++;
+  	  this.update();
+    }
+  </script>
+  
+</btn>

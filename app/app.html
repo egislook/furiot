@@ -1,0 +1,47 @@
+<app>
+  
+  <splash if={!loaded} />
+  
+  <div if={loaded}>
+    <h1 class="fw:200 fs:250pc">
+    	<a class="c:black fw:400 c:5FBA7D" target="_blank" href="http://www.deezer.com">Fucss</a> 
+      Hello world
+    </h1>
+    
+    <btn greeting="click me"/>
+    
+    <div>
+      <div class="p:5px-0" each={ project, key in data.e4education }>
+        <a class="c:white p:10px-20px dp:ib bg:grey" href="{ project.link }" target="_blank">
+          { project.title }
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+  
+    this.loaded = false;
+    this.data = {};
+    this.db = this.opts.db;
+    let self = this;
+    
+    this.refreshData = () => {
+      self.db.ref().once('value').then((snapshot) => {
+    	  self.loaded = true;
+    	  self.data = snapshot.val();
+    	  self.update();
+    	  console.log(this.data);
+    	  })
+      }
+    this.refreshData();
+  	
+  	this.db.ref().on("child_changed", self.refreshData);
+  	this.db.ref().on("child_added", self.refreshData);
+  	this.db.ref().on("child_removed", self.refreshData);
+  	
+  	
+  	
+  </script>
+
+</app>
