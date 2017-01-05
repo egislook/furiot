@@ -1,0 +1,169 @@
+<app>
+  
+  <loading-screen if="{ !loaded }" />
+  
+  <main if="{ loaded }" class="mxw:600px p-b:80px p-rl:2pc">
+    
+    <div class="dp:tb bg:white p:10px-30px p-r:20px fux-boxsh w:100pc">
+      <a class="fw:400 c:sec dp:tc va:t p-tb:2px ta:l" href="{ data.meta.link }" target="_blank">{ data.meta.title }</a>
+      <div class="dp:tc ta:r">
+        <a href="#" class="dp:ib c:black" onclick="{ !user && handleLogin || handleLogout }">
+          <span if="{ !user }" class="va:t p-t:2px dp:ib p-r:5px">Login via</span> 
+          <span if="{ user }" class="va:t p-t:2px dp:ib p-r:5px">{ user.name }</span> 
+          <i class="{ 
+            'fu-facebook-with-circle c:blue fs:150pc': !user, 
+            'fu-power c:silver fs:150pc': user}" />
+        </a>
+      </div>
+    </div>
+    
+  	<editable-text 
+  	  class="fw:200 fs:160pc m-tb:20px m-t:10px dp:ib" 
+  	  on-edit="{ handleDescEdit }" 
+  	  max="50"
+  	  on-error="{ handleErrorToggle }"
+  	  text="{ data.meta.desc }" />
+    
+    <raw if="{ false }" html="{ data.meta.html }"/>
+    
+    <task-tile 
+      if="{ !!ghostTask }"
+      desc-placeholder="{ data.phrase.needSomeTaskDesc }"
+      is-ghost="{ true }"
+      key="{ ghostTask.key }"
+      title-placeholder="{ data.phrase.needSomeTaskTitle }"
+      user-photo="{ user && user.photo }"
+      user-uid="{ user && user.uid }"
+      user-name="{ user && user.name }"
+      on-add="{ handleTaskAdd }"
+      on-edit="{ handleTaskEdit }"
+      on-error="{ handleErrorToggle }"
+      on-remove="{ handleGhostTask }" />
+    
+    <!-- parent is required to access data and methods in for each -->
+    <task-tile 
+      each="{ todo, key in data.todo }" 
+      desc="{ todo.desc }" 
+      desc-placeholder="{ parent.data.phrase.needSomeTaskDesc }"
+      key="{ key }"
+      title="{ todo.title }"
+      title-placeholder="{ parent.data.phrase.needSomeTaskTitle }"
+      timestamp="{ todo.timestamp }"
+      user-photo="{ todo.user && todo.user.photo }"
+      user-uid="{ todo.user && todo.user.uid }"
+      user-name="{ todo.user && todo.user.name }"
+      on-edit="{ parent.handleTaskEdit }"
+      on-error="{ parent.handleErrorToggle }"
+      on-remove="{ parent.handleTaskRemove }" />
+    
+    <button 
+      if="{ !ghostTask }"
+      class="ps:fx b:0 l,r:50pc p:20px fs:120pc bg:sec fux-boxsh c:white br:50pc lh:1 m:15px m-l:20npx fu-plus"
+      onclick="{ user && handleGhostTask || handleLogin }" />
+      
+    <toast msg="{ toastMessage }" on-remove="{ handleErrorToggle }" />
+    <modal if="{ !!modalAction }" on-action="{ handleModalActionToggle }" />
+    
+  </main>
+  
+  <script>
+    
+    // MUST HAVE this part. 
+    // it loads firebase data to this.data object or tag.data object
+    //--------------------------
+    let tag = this;
+    this.loaded = false;
+    this.data = {};
+    this.user = false;
+    this.db = this.opts.db;
+    this.auth = this.opts.auth;
+    
+    tag.db.ref().orderByChild('timestamp').on('value', (snapshot) => {
+      tag.loaded = true;
+  	  tag.data = snapshot.val();
+  	  
+  	  tag.update();
+  	  console.dir(tag.data);
+    }, tag.handleErrorToggle);
+    
+    /*this.refreshData = () => {
+      tag.db.ref().once('value').then((snapshot) => {
+    	  
+    	});
+    }*/
+    
+    //this.refreshData();
+  	
+  	//this.db.ref().on('child_changed', tag.refreshData.then(() => console.log(arguments)));
+  	//this.db.ref().on('child_added', tag.refreshData);
+  	//this.db.ref().on('child_removed', tag.refreshData);
+  	this.auth.onAuthStateChanged((user) => {
+  	  tag.user = user && {
+  	    name: user.displayName,
+  	    email: user.email,
+  	    photo: user.photoURL,
+  	    uid: user.uid
+  	  }
+  	  console.dir(tag.user);
+  	  tag.update();
+  	});
+    
+    //--------------------------
+    
+    
+    // Other stuff
+    this.toastMessage = null;
+    this.modalAction = null;
+    this.ghostTask = null;
+    
+    
+    // Methods ---------
+    
+    this.handleLogin = () => tag.opts.signInWithRedirect();
+    this.handleLogout = () => tag.auth.signOut();
+    
+    this.handleGhostTask = () => {
+      tag.ghostTask = !tag.ghostTask 
+        ? { key: new Date().getTime(), uid: tag.db.ref('todo').push().key } : null;
+      tag.update();
+    }
+  	
+  	this.handleDescEdit = (desc) => 
+  	  tag.db.ref('meta/').update({desc}).catch(tag.handleErrorToggle);
+  	
+  	this.handleTaskEdit = (key, field, value) => 
+  	  tag.db.ref('todo/' + key).update({[field]: value}).catch(tag.handleErrorToggle);
+  	  
+  	this.handleTaskAdd = (key, data) => {
+  	  data.user = tag.user;
+  	  data.timestamp = key;
+  	  tag.db.ref('todo/' + key).setWithPriority(data, 0 - Date.now()).catch(tag.handleErrorToggle);
+  	}
+  	
+  	this.handleErrorToggle = (value, size) => {
+  	  tag.toastMessage = !tag.toastMessage 
+  	    ? size 
+  	      ? `'${value}' ${tag.data.phrase.incorrectInput} ${size.min} & ${size.max}`
+  	      : value
+  	    : null;
+  	  tag.update();
+  	}
+  	
+  	this.handleModalActionToggle = (actionOrConfirmation) => {
+  	  if(typeof actionOrConfirmation === 'function'){
+  	    //sets confirmation action
+  	    tag.modalAction = actionOrConfirmation;
+  	  } else {
+    	  //confirms or denies the action
+    	  actionOrConfirmation && tag.modalAction();
+    	  tag.modalAction = null;
+  	  }
+  	  tag.update();
+  	}
+  	
+  	this.handleTaskRemove = (key) => 
+  	  tag.handleModalActionToggle(() => tag.db.ref('todo/' + key).remove().catch(tag.handleErrorToggle));
+  	
+  </script>
+
+</app>

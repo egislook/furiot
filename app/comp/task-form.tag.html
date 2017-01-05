@@ -1,0 +1,44 @@
+<task-form>
+  <form if="{ false }" class="dp:tb w:100pc m-tb:20px ps:rel" onsubmit="{ eventAddTask }">
+    <div class="dp:tc w:100pc">
+      <input 
+        ref="title" 
+        placeholder="{ data.phrase.whatIsTheTaskName }" 
+        class="{
+          'fs:120pc p:20px w:100pc dp:bk bd:sld-silver-1px fc-bd-c:black': true, 
+          'bd-c:red': !!msg
+        }">
+    </div>
+    <button class="p:20px fs:120pc bg:black c:white dp:tc bd:sld-black-1px"><i class="fu-plus" /></button>
+  </form>
+  
+  <script>
+    let tag = this;
+    
+    this.eventAddTask = (e) => {
+  	  e.preventDefault();
+      e.stopPropagation();
+      
+      let title = tag.refs.title.value;
+      if(title.length < tag.inputSize.min || title.length > tag.inputSize.max){
+        tag.msg = `${tag.data.phrase.incorrectInput} ${tag.inputSize.min} & ${tag.inputSize.max}`;
+        
+        clearTimeout(tag.timer);
+        tag.timer = setTimeout(() => {
+          tag.msg = null;
+          tag.update();
+        }, tag.timeout);
+        
+        return;
+      }
+      
+      tag.refs.title.value = '';
+      let timestamp = new Date().getTime();
+      let uid = `${timestamp}_${title.split(' ').join('_')}`;
+      //var newTask = tag.db.ref('todo').push();
+      //newTask.set({title, timestamp});
+      tag.db.ref(`todo/${uid}`).set({title, timestamp});
+  	}
+  	
+  </script>
+</task-form>

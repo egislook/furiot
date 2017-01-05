@@ -1,0 +1,147 @@
+<editable-text>
+  <div 
+    ref="tag"
+    placeholder="{ placeholder }"
+    contentEditable="{ opts.contentEditable || contentEditable }"
+    class="{ opts.class } {
+      'fux-pl bd-l:sd-1px-ts fc-bd-c:green fc-p-l:5px ta:l' : !opts.noBasicClass,
+      'c:red fc-bd-c:red' : !isValid
+    }"
+    onclick="{ !contentEditable && handleSetEditable }"
+    onblur="{ handleUpdateEditable }"
+    onkeyup="{ handleTextLength }"
+    onmouseup="{ opts.editorEnabled && handleDisplayEditor }">{ opts.text }</div>
+  
+  <div if="{ contentEditable && textLength && !opts.noLength }" class="{
+    'fs:80pc ps:ab p:2px-5px c:white z:10 op:0.8': true, 
+    'bg:green': isValid, 
+    'bg:red': !isValid }">
+      { textLength }
+  </div>
+  
+  <div if="{ !!editor }" 
+    class="bg:black c:white br:3px p:10px ps:ab m-t:50npx fadeIn fs:120pc m:5px_i fux-arrow" 
+    style="top: {editor.top}px; left: {editor.left}px">
+      <i class="fu-format_bold" />
+      <i class="fu-format_italic" />
+      <i class="fu-format_size"/>
+      <i class="fu-format_clear" />
+  </div>
+  
+  <script>
+    let tag = this;
+    
+    this.editor = null;
+    this.isError = null;
+    
+    this.size = {
+      min : this.opts.min || 3, 
+      max : this.opts.max || 100 
+    };
+    this.textLength = this.opts.text && this.opts.text.length || 0;
+    this.placeholder = this.opts.placeholder !== undefined 
+      ? this.opts.placeholder 
+      : 'defaut placeholder';
+      
+    this.contentEditable = this.placeholder && !this.opts.text 
+      ? 'plaintext-only' 
+      : false;
+      
+    this.handleIsValid = (text) => text.length >= tag.size.min && text.length <= tag.size.max;
+      
+    this.isValid = this.handleIsValid(this.opts.text);
+    
+      
+    // Methods ---------
+    
+    this.on('mount', () => tag.opts.autofocus && tag.refs.tag.focus() );
+    
+    this.handleSetEditable = (e) => {
+      this.contentEditable = 'plaintext-only';
+      this.update();
+  	  e.target.focus();
+  	}
+  	
+  	this.handleTextLength = (e) => {
+  	  let text = e.target && e.target.innerText || e;
+  	  tag.isValid = tag.handleIsValid(text);
+  	  tag.textLength = text.length;
+  	  tag.update();
+  	}
+  	
+  	this.handleUpdateEditable = (e) => {
+	    let text = e.target.innerText.trim();
+	    tag.editor = !!tag.editor && null;
+	    tag.isError = !!tag.isError && null;
+	    
+	    if(!!text.length) tag.contentEditable = false;
+	    
+	    if(!!text.length && tag.opts.text === text) return;
+	    
+	    if(!tag.handleIsValid(text)){
+	      if(!tag.opts.text){
+	        tag.isError = true;  
+	      } else {
+	        e.target.innerText = tag.opts.text || text;
+	        tag.handleTextLength(tag.opts.text);
+	        tag.contentEditable = false;
+	      }
+	      return tag.opts.onError && tag.opts.onError(text, tag.size, tag.opts.cbExtras);
+	    }
+	    
+	    e.target.innerText = text;
+	    tag.handleTextLength(text);
+	    return tag.opts.onEdit && tag.opts.onEdit(text, tag.opts.cbExtras);
+	  }
+  	
+  	this.handleDisplayEditor = (e) => {
+  	  let s = window.getSelection();
+      let oRange = s.getRangeAt(0);
+      let oRect = oRange.getBoundingClientRect();
+      this.editor = oRange.endOffset - oRange.startOffset > 0 && oRect;
+      this.update();
+  	}
+  	
+  	/*this.opts = {
+      autofocus:      this.opts.autofocus || false,
+      'class':        this.opts.class || '',
+      cbExtras:       this.opts.cbExtras || {},
+      editorEnabled:  this.opts.editorEnabled || false,
+      noBasicClass:   this.opts.noBasicClass || false,
+      min:            this.opts.min || 3, 
+      max:            this.opts.max || 100,
+      text:           this.opts.text || '',
+      placeholder:    this.opts.placeholder !== undefined ? this.opts.placeholder : 'defaut placeholder',
+      onError:        this.opts.onError || ((text, size, cbExtras) => console.log('onError', text, size, cbExtras)),
+      onEdit:         this.opts.onEdit || ((text, cbExtras) => console.log('onEdit', text, cbExtras)),
+    };*/
+  	
+  </script>
+  
+  <style>
+    .fux-pl{
+	    white-space: pre-line;
+	    word-wrap: normal;
+	  }
+	  .fux-pre{
+	    white-space: pre;
+	    word-wrap: normal;
+	  }
+	  .fux-arrow:before{
+      content: ' ';
+      position: absolute;
+      width: 0;
+      height: 0;
+      left: 0px;
+      bottom: -8px;
+      border: 5px solid;
+      border-color: black transparent transparent black;
+	  }
+	  [contenteditable='plaintext-only']:empty:before{
+      content: attr(placeholder);
+      opacity: 0.5;
+      display: block;
+    }
+  </style>
+  
+</editable-text>

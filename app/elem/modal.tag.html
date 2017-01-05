@@ -1,0 +1,38 @@
+<modal>
+  <div class="dp:tb bg:000a3 w,h:100pc ps:fx t,l:0 fux-fadeIn" onclick="{ handleConfirmation(false) }">
+    <div class="dp:tc va:m ta:c">
+      
+      <div class="bg:white ta:l p:20px-20px-15px-20px w:300px br:3px b:50px fs:90pc fw:400 ps:rl fux-boxsh">
+        <i class="ps:ab t,r:0 m:15px fu-cross crs:pt" onclick="{ handleConfirmation(false) }" />
+        <h3 class="fw:500">{ opts.title }</h3>
+        <p class="fw:400 m-t:10px m-b:20px">{ opts.desc }</p>
+        <div class="ta:r fs:100pc_a p:8px-30px_a br:3px_a bg:n_a bd:sld-1px-silver_a c:silver_a fw:400_a dp:ib_a">
+          <a href="#" class="fc-c:white fc-bg:sec fc-bd-c:sec" onclick="{ handleConfirmation(false) }">{ opts.no }</a>
+          <a href="#" class="fc-c:white fc-bg:sec fc-bd-c:sec" ref="yes" onclick="{ handleConfirmation(true) }">{ opts.yes }</a>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <script>
+    let tag = this;
+    this.opts = {
+      title:    this.opts.title || 'Confirmation',
+      desc:     this.opts.desc || 'Are you sure you want to remove this?',
+      yes:      this.opts.yes || 'Yes',
+      no:       this.opts.no || 'No',
+      onAction: this.opts.onAction || ((confirm) => console.log(confirm)),
+      autofocus: true
+    }
+    
+    this.on('mount', () => tag.opts.autofocus && tag.refs.yes.focus() );
+    
+    this.handleConfirmation = (confirmed) => 
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        tag.opts.onAction && tag.opts.onAction(confirmed);
+      }
+  </script>
+</modal>

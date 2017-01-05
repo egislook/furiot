@@ -1,0 +1,86 @@
+<task-tile>
+  <div class="p:20px-30px m-tb:10px bg:white ta:l fux-boxsh ps:rl fux-fadeIn" >
+    
+    <div class="m-l:0 fs:90pc dp:tb ta:l m-b:5px">
+      <div if="{ opts.userPhoto }" class="dp:tc va:m p-r:10px">
+        <img class="dp:ib w:35px br:50pc" src="{ opts.userPhoto }" />
+      </div>
+      <div class="dp:tc va:m lh:1.2_div">
+        <div class="c:sec fw:400" if="{ opts.userName }">{ opts.userName }</div>
+        <div class="c:000a5 fs:85pc fw:400">{ getTimestamp() }</div>
+      </div>
+    </div>
+    
+    <editable-text 
+      class="fw:500 fs:120pc"
+      autofocus="{ opts.isGhost }"
+      cb-extras="{ { key: opts.key, field: 'title' } }"
+      placeholder="{ opts.titlePlaceholder }"
+      text="{ opts.title }"
+      on-edit="{ handleFieldEdit }"
+      on-error="{ handleFieldError }"
+      on-validate="{ handleFieldValidation }" />
+    
+    <editable-text 
+      class="c:grey"
+      cb-extras="{ { key: opts.key, field: 'desc' } }"
+      max="400"
+      placeholder="{ opts.descPlaceholder }"
+      text="{ opts.desc }"
+      on-edit="{ handleFieldEdit }"
+      on-error="{ handleFieldError }" />
+    
+    <button 
+      class="ps:ab t,r:0 m:20px c:silver fs:120pc fu-cross crs:pt bg:n p:0 hv-c:red"
+      onclick="{ handleRemove }" />
+    
+    <button if="{ opts.isGhost }"
+      class="ps:ab b,r:0 m:20px c:silver fs:120pc fu-check crs:pt bg:n p:0 hv-c:green"
+      onclick="{ handleSubmit }" />
+    
+  </div>
+  
+  <script>
+    let tag = this;
+    this.error = null;
+    this.ghostTask = {};
+    
+    // Methods --------- 
+    
+    this.handleFieldEdit = (value, extras) => {
+      this.error = null;
+      if(!tag.opts.isGhost){
+        tag.opts.onEdit && tag.opts.onEdit(extras.key, extras.field, value);
+        return tag.update();
+      }
+      
+      tag.ghostTask[extras.field] = value;
+      //console.log(value, extras);
+      //tag.opts.onRemove && tag.opts.onRemove(tag.opts.key);
+    }
+    
+    this.handleFieldValidation = () => {
+      console.log('validate');
+    }
+    
+    this.getTimestamp = () => window.moment(tag.opts.timestamp || parseInt(tag.opts.key)).fromNow();
+    
+    this.handleFieldError = (value, size, extras) => {
+      if(!tag.opts.isGhost) return tag.opts.onError && tag.opts.onError(value, size);
+      //console.log(value, size, extras);
+      tag.error = {value, size, extras};
+    }
+    
+    this.handleSubmit = () => {
+      if(tag.error) return tag.opts.onError(tag.error.value, tag.error.size);
+      
+      tag.opts.onAdd && tag.opts.onAdd(tag.opts.key, tag.ghostTask);
+      tag.opts.onRemove && tag.opts.onRemove();
+    }
+    
+    this.handleRemove = (e) => 
+      tag.opts.onRemove && tag.opts.onRemove(tag.opts.key);
+      
+    //console.log(this.opts, this.opts.onedit);
+  </script>
+</task-tile>

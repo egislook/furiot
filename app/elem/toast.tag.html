@@ -1,0 +1,24 @@
+<toast>
+  <div if="{ !!opts.msg }" 
+    class="ps:fx c:white bg:000a7 p:20px-30px w:300px m-l:150npx l:50pc br:3px b:50px fs:90pc fw:400 fux-fadeIn"
+    onclick="{ handleToastRemove }">{ opts.msg }</div>
+  
+  <script>
+    let tag = this;
+    this.timer = null;
+    this.opts.timeout = this.opts.timeout || 5000;
+    
+    this.handleToastRemove = () => {
+      clearTimeout(tag.timer);
+      tag.opts.onRemove && tag.opts.onRemove();
+    }
+    
+    this.on('update', () => {
+      if(!!tag.opts.msg){
+        clearTimeout(tag.timer);
+        tag.timer = setTimeout(tag.handleToastRemove, tag.opts.timeout);
+      }
+    });
+  </script>
+  
+</toast>

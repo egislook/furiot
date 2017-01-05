@@ -1,0 +1,13 @@
+<raw>
+  <div ref="raw" />
+  
+  <script>
+    let tag = this;
+    
+    this.on('updated', () => {
+      if(tag.refs.raw && tag.refs.raw.innerHTML !== tag.opts.html)
+        tag.refs.raw.innerHTML = tag.opts.html;
+    });
+  </script>
+  
+</raw>

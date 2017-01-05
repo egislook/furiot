@@ -3,67 +3,58 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
-		<script>
-		  let fucssInit = false;
-		</script>
-		<!-- !!! comment before deploying -->
-		<script src="https://cdn.rawgit.com/noneedsystem/fucss/0.6.0/fucss.min.js"></script>
-		
 		<!-- !!! uncomment before deploying -->
 		<!--<link rel="stylesheet" href="./style.css">-->
-		<!-- We need this! --> 
-		<link rel="stylesheet" href="https://cdn.rawgit.com/noneedsystem/fuico/0.0.7c/style.css">
+		<!-- Styles --> 
+		<link rel="stylesheet" href="https://cdn.rawgit.com/noneedsystem/fuico/0.0.8/style.css">
 		<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500" rel="stylesheet">
-	
 	</head>
-	<body class="ff:Quicksand ff:Roboto_input fw:300_input fs:15px lg-fs:16px fw:300 lh:1.3 ta:c bz:bb_all m:0-auto_all m:0 td:n_a bg:F1F1F1 p-t:70px crs:pt_a">
+	<body class="m:0 ff:Quicksand_all fw:300_all ol:0_all fs:15px lg-fs:16px lh:1.3 ta:c bz:bb_all m:0-auto_all bg:F1F1F1 td:n_a crs:pt_a,button bd:0_all">
 		<app></app>
 	  
-  	<script type="text/javascript" src="https://cdn.jsdelivr.net/riot/3.0.2/riot.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/riot-route/3.0.2/route.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/riot/3.0.2/riot+compiler.js"></script>
+	  <!-- Just in case scripts -->
+	  <!-- 
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/superagent/1.2.0/superagent.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
+		-->
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+  	<script type="text/javascript" src="https://cdn.jsdelivr.net/riot/3.0.5/riot.min.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/riot-route/3.0.2/route.min.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/riot/3.0.5/riot+compiler.js"></script>
 		<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+		<!-- !!! comment before deploying -->
+		<script src="https://cdn.rawgit.com/noneedsystem/fucss/0.6.2/fucss.min.js"></script>
+		
 		<!-- riot tags -->
-		<script type="riot/tag" src="./app/splash.html"></script>
-		<script type="riot/tag" src="./app/btn.html"></script>
-		<script type="riot/tag" src="./app/app.html"></script>
+		<!-- element tags -->
+		<script type="riot/tag" src="./app/elem/btn.tag.html"></script>
+		<script type="riot/tag" src="./app/elem/raw.tag.html"></script>
+		<script type="riot/tag" src="./app/elem/toast.tag.html"></script>
+		<script type="riot/tag" src="./app/elem/modal.tag.html"></script>
+		<script type="riot/tag" src="./app/elem/editable-text.tag.html"></script>
+		<!-- component tags -->
+		<script type="riot/tag" src="./app/comp/loading-screen.tag.html"></script>
+		<script type="riot/tag" src="./app/comp/task-tile.tag.html"></script>
+		<!-- main tags -->
+		<script type="riot/tag" src="./app/app.tag.html"></script>
   	
   	<script>
   		// Initialize Firebase
   		let config = {
-  		  apiKey: "AIzaSyBNfZXQiLBPM_7Q_sEjNpl2-oW6LyEG6-0",
-  		  authDomain: "portfolio-16258.firebaseapp.com",
-  		  databaseURL: "https://portfolio-16258.firebaseio.com",
-  		  storageBucket: "portfolio-16258.appspot.com",
-  		  messagingSenderId: "801469326226"
+  		  apiKey: "AIzaSyBQ01AGchS9Pqx6jN-Dg8n_-4NQ78sXjKI",
+  		  databaseURL: "https://todo-5fb17.firebaseio.com/",
+  		  authDomain: "todo-5fb17.firebaseapp.com",
   		};
   		
   		firebase.initializeApp(config);
-  		let db = firebase.database();
+  		let provider = new firebase.auth.FacebookAuthProvider();
   		
-  		riot.mount('*', {db});
-  		
-  		// riot fucss loader
-  		// !!! comment before deploying
-  		let _tags = document.querySelectorAll('script[type="riot/tag"');
-      let _jsStr = document.body.outerHTML;
-      let _jsLoadedCount = 0;
-      _tags.forEach(function(tag){
-      	window.riot.compile(tag.src, function(js){
-	      	_jsStr += js;
-	      	_jsLoadedCount++;
-	      	if(_jsLoadedCount === _tags.length){
-	      		fucss.generateStyling({riot: _jsStr, returnStyle: false});
-      			//route.base('/');
-      			//route.start(true);
-      			
-	      	}
-      	});
-      });
+  		riot.mount('*', {
+  		  db: firebase.database(), 
+  		  signInWithRedirect: () => firebase.auth().signInWithRedirect(provider),
+  		  auth: firebase.auth(),
+  		});
   		
   	</script>
     
