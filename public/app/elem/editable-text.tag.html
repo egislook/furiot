@@ -4,8 +4,8 @@
     placeholder="{ placeholder }"
     contentEditable="{ opts.contentEditable || contentEditable }"
     class="{ opts.class } {
-      'fux-pl bd-l:sd-1px-ts fc-bd-c:green fc-p-l:5px ta:l' : !opts.noBasicClass,
-      'c:red fc-bd-c:red' : !isValid
+      'ws:pl ww:nm bd-l:sd-1px-ts fc-bd-c:prim fc-p-l:5px ta:l' : !opts.noBasicClass,
+      'c:err fc-bd-c:err' : !isValid
     }"
     onclick="{ !contentEditable && handleSetEditable }"
     onblur="{ handleUpdateEditable }"
@@ -13,9 +13,9 @@
     onmouseup="{ opts.editorEnabled && handleDisplayEditor }">{ opts.text }</div>
   
   <div if="{ contentEditable && textLength && !opts.noLength }" class="{
-    'fs:80pc ps:ab p:2px-5px c:white z:10 op:0.8': true, 
-    'bg:green': isValid, 
-    'bg:red': !isValid }">
+    'fs:80pc ps:ab p:2px-5px c:white z:10 op:0.8 va:t': true, 
+    'bg:prim': isValid, 
+    'bg:err': !isValid }">
       { textLength }
   </div>
   
@@ -119,14 +119,6 @@
   </script>
   
   <style>
-    .fux-pl{
-	    white-space: pre-line;
-	    word-wrap: normal;
-	  }
-	  .fux-pre{
-	    white-space: pre;
-	    word-wrap: normal;
-	  }
 	  .fux-arrow:before{
       content: ' ';
       position: absolute;
@@ -137,11 +129,6 @@
       border: 5px solid;
       border-color: black transparent transparent black;
 	  }
-	  [contenteditable='plaintext-only']:empty:before{
-      content: attr(placeholder);
-      opacity: 0.5;
-      display: block;
-    }
   </style>
   
 </editable-text>

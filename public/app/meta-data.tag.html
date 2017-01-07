@@ -1,0 +1,23 @@
+<meta-data>
+  <title>{opts.title || 'title'}</title>
+	<!-- for Google -->
+	<meta name="description" content="{opts.description || 'description'}" />
+	<meta name="author" content="{opts.author || 'author'}" />
+	<meta name="copyright" content="{opts.title}. All Rights Reserved." />
+	<meta name="application-name" content="{opts.title || 'title'}" />
+	<!-- for Facebook -->
+	<meta property="og:title" content="{opts.title || 'title'}" />
+	<meta property="og:image" content="{opts.cover || '/cover.png'}" />
+	<meta property="og:url" content="{opts.url || 'url'}" />
+	<meta property="og:description" content="{opts.description || 'description'}" />
+	<!-- for Twitter -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="{opts.title || 'title'}" />
+	<meta name="twitter:description" content="{opts.description || 'description'}" />
+	<meta name="twitter:image" content="{opts.cover || '/cover.png'}" />
+	<!-- favicon -->
+	<link rel="shortcut icon" type="image/x-icon" href="${opts.favicon || '/favicon.ico'}" />
+	
+	<script>
+	</script>
+</meta-data>

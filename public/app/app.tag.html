@@ -4,27 +4,34 @@
   
   <main if="{ loaded }" class="mxw:600px p-b:80px p-rl:2pc">
     
-    <div class="dp:tb bg:white p:10px-30px p-r:20px fux-boxsh w:100pc">
-      <a class="fw:400 c:sec dp:tc va:t p-tb:2px ta:l" href="{ data.meta.link }" target="_blank">{ data.meta.title }</a>
-      <div class="dp:tc ta:r">
-        <a href="#" class="dp:ib c:black" onclick="{ !user && handleLogin || handleLogout }">
-          <span if="{ !user }" class="va:t p-t:2px dp:ib p-r:5px">Login via</span> 
-          <span if="{ user }" class="va:t p-t:2px dp:ib p-r:5px">{ user.name }</span> 
-          <i class="{ 
-            'fu-facebook-with-circle c:blue fs:150pc': !user, 
-            'fu-power c:silver fs:150pc': user}" />
-        </a>
-      </div>
-    </div>
+    <navigation 
+      routes="{ data.route }" 
+      user="{ user }" 
+      on-login="{ handleLogin }" 
+      on-logout="{ handleLogout }"/>
     
-  	<editable-text 
-  	  class="fw:200 fs:160pc m-tb:20px m-t:10px dp:ib" 
-  	  on-edit="{ handleDescEdit }" 
-  	  max="50"
-  	  on-error="{ handleErrorToggle }"
-  	  text="{ data.meta.desc }" />
+    <div class="m-tb:30px">
+    	<editable-text 
+    	  class="fw:200 fs:150pc dp:ib" 
+    	  on-edit="{ handleDescEdit }" 
+    	  max="50"
+    	  on-error="{ handleErrorToggle }"
+    	  text="{ data.meta.desc }" />
+  	</div>
     
     <raw if="{ false }" html="{ data.meta.html }"/>
+    <div if="{ false }">
+      <input placeholder="wtf"/>
+  		<button>tadam</button>
+  		<textarea>
+  			asdasdasd
+  		</textarea>
+  		<a>link</a>
+    </div>
+    
+    <colors />
+    
+    <meta-data if="{ true }" />
     
     <task-tile 
       if="{ !!ghostTask }"
@@ -86,17 +93,6 @@
   	  console.dir(tag.data);
     }, tag.handleErrorToggle);
     
-    /*this.refreshData = () => {
-      tag.db.ref().once('value').then((snapshot) => {
-    	  
-    	});
-    }*/
-    
-    //this.refreshData();
-  	
-  	//this.db.ref().on('child_changed', tag.refreshData.then(() => console.log(arguments)));
-  	//this.db.ref().on('child_added', tag.refreshData);
-  	//this.db.ref().on('child_removed', tag.refreshData);
   	this.auth.onAuthStateChanged((user) => {
   	  tag.user = user && {
   	    name: user.displayName,

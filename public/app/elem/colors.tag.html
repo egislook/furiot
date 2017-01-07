@@ -1,0 +1,23 @@
+<colors>
+  <div if="{false}" class="bg:white dp:flx flxw:wrp p:10px">
+    <span 
+      each="{ color, key in colors }" 
+      class="w:100pc sm-w:32pc m-b:10px fs:80pc c:white fw:400 p:10px_div ta:l">
+      <div style="background-color: { color }">{ color } { key }</div>
+      <div class="fs:80pc" each="{ modifier, val in colorModifiers}" style="background-color: { generateColor(color, modifier) }">
+        { generateColor(color, modifier) } { key }{ val } 
+      </div>
+    </span>
+  </div>
+  
+  <script>
+    let tag = this;
+    this.colors = window.fucss && window.fucss.colors || {};
+    // colors using alphas
+    //this.colorModifiers = ['a13', 'a31', 'a50', 'a7', 'a85', '', 'a91', 'a81', 'a71', 'a52'];
+    this.colorModifiers = window.fucss && window.fucss.colorMods || {};
+    this.generateColor = window.fucss && window.fucss.generateColor || {};
+    
+  </script>
+  
+</colors>

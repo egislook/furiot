@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta name="google-site-verification" content="s1ONqkgIU-hYY1QYzqSA12QIB8HHjFKQ0h6XNzPplKI" />
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
+		
+		
 		<!-- !!! uncomment before deploying -->
-		<!--<link rel="stylesheet" href="./style.css">-->
+		<link rel="stylesheet" href="./style.css">
 		<!-- Styles --> 
 		<link rel="stylesheet" href="https://cdn.rawgit.com/noneedsystem/fuico/0.0.8/style.css">
 		<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500" rel="stylesheet">
 	</head>
-	<body class="m:0 ff:Quicksand_all fw:300_all ol:0_all fs:15px lg-fs:16px lh:1.3 ta:c bz:bb_all m:0-auto_all bg:F1F1F1 td:n_a crs:pt_a,button bd:0_all">
+	<body class="prim:lime800 sec:dorange err:red warn:yellow ff:Quicksand_all fw:300 fs:15px lg-fs:16px lh:1.3 bg:F1F1F1">
+		
 		<app></app>
 	  
 	  <!-- Just in case scripts -->
@@ -24,20 +28,23 @@
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/riot/3.0.5/riot+compiler.js"></script>
 		<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
 		<!-- !!! comment before deploying -->
-		<script src="https://cdn.rawgit.com/noneedsystem/fucss/0.6.2/fucss.min.js"></script>
+		<!--<script src="https://cdn.rawgit.com/noneedsystem/fucss/0.6.4/fucss.min.js"></script>-->
+		<!--<script src="./fucss.js"></script>-->
 		
 		<!-- riot tags -->
 		<!-- element tags -->
-		<script type="riot/tag" src="./app/elem/btn.tag.html"></script>
-		<script type="riot/tag" src="./app/elem/raw.tag.html"></script>
-		<script type="riot/tag" src="./app/elem/toast.tag.html"></script>
-		<script type="riot/tag" src="./app/elem/modal.tag.html"></script>
-		<script type="riot/tag" src="./app/elem/editable-text.tag.html"></script>
+		<script type="riot/tag" data-src="./app/elem/btn.tag.html"></script>
+		<script type="riot/tag" data-src="./app/elem/raw.tag.html"></script>
+		<script type="riot/tag" data-src="./app/elem/toast.tag.html"></script>
+		<script type="riot/tag" data-src="./app/elem/modal.tag.html"></script>
+		<script type="riot/tag" data-src="./app/elem/editable-text.tag.html"></script>
+		<script type="riot/tag" data-src="./app/elem/navigation.tag.html"></script>
+		<script type="riot/tag" data-src="./app/elem/colors.tag.html"></script>
 		<!-- component tags -->
-		<script type="riot/tag" src="./app/comp/loading-screen.tag.html"></script>
-		<script type="riot/tag" src="./app/comp/task-tile.tag.html"></script>
+		<script type="riot/tag" data-src="./app/comp/loading-screen.tag.html"></script>
+		<script type="riot/tag" data-src="./app/comp/task-tile.tag.html"></script>
 		<!-- main tags -->
-		<script type="riot/tag" src="./app/app.tag.html"></script>
+		<script type="riot/tag" data-src="./app/app.tag.html"></script>
   	
   	<script>
   		// Initialize Firebase

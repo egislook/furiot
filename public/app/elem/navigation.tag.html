@@ -1,0 +1,19 @@
+<navigation>
+  <div class="dp:flx smx-fd:col c:white600 bg:sec600 p:10px-30px smx-p:0 p-r:20px fux-boxsh w:100pc">
+      <a if="{ !route.hide }" each="{ route in opts.routes }" 
+        class="dp:bk smx-m:0 fw:500 p-tb:2px smx-p-tb:5px bd-b-w:1px bd-c:sec700 sm-bd:0" 
+        href="{ route.link }" 
+        target="{ route.target && '_blank' }">{ route.title }</a>
+        
+      <div class="ta:r smx-p-tb:5px fs:90pc">
+        <a href="#" onclick="{ !opts.user && opts.onLogin || opts.onLogout }">
+          <span if="{ !opts.user }" class="p-r:5px">Login via</span> 
+          <span if="{ opts.user }" class="p-r:5px">{ opts.user.name }</span> 
+          <i class="{ 
+            'fu-facebook3': !opts.user, 
+            'fu-power': opts.user}" />
+        </a>
+      </div>
+    </div>
+  
+</navigation>
