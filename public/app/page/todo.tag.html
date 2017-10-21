@@ -1,0 +1,76 @@
+<todo>
+  
+  <task-tile 
+    if="{ !!ghostTask }"
+    desc-placeholder="{ phrases.needSomeTaskDesc }"
+    is-ghost="{ true }"
+    key="{ ghostTask.key }"
+    title-placeholder="{ phrases.needSomeTaskTitle }"
+    user-photo="{ user && user.photo }"
+    user-uid="{ user && user.uid }"
+    user-name="{ user && user.name }"
+    on-add="{ handleTaskAdd }"
+    on-edit="{ handleTaskEdit }"
+    on-error="{ handleErrorToggle }"
+    on-remove="{ handleGhostTask }" />
+  
+  <!-- parent is required to access data and methods in for each -->
+  <task-tile
+    each="{ todo, key in todos }" 
+    desc="{ todo.desc }" 
+    desc-placeholder="{ parent.phrases.needSomeTaskDesc }"
+    key="{ key }"
+    title="{ todo.title }"
+    title-placeholder="{ parent.phrases.needSomeTaskTitle }"
+    timestamp="{ todo.timestamp }"
+    user-photo="{ todo.user && todo.user.photo }"
+    user-uid="{ todo.user && todo.user.uid }"
+    user-name="{ todo.user && todo.user.name }"
+    on-edit="{ parent.handleTaskEdit }"
+    on-error="{ parent.handleErrorToggle }"
+    on-remove="{ parent.handleTaskRemove }" />
+  
+  <button 
+    if="{ !ghostTask }"
+    class="ps:fx b:0 l,r:50pc p:20px fs:120pc bg:sec fux-boxsh c:white br:50pc lh:1 m:15px m-l:20npx fu-plus"
+    onclick="{ user && handleGhostTask }" />
+  
+  <script>
+    this.mixin('Store');
+    
+    let tag = this;
+    this.todos = {};
+    this.user = {};
+    this.phrases = {};
+    this.db = this.opts.db;
+    this.ghostTask = null;
+    
+    this.update(this.appStore.getData(['todos', 'user', 'phrases']));
+    this.appStore.on('data', (data) => 
+      tag.update(this.appStore.getData(['todos', 'user', 'phrases'])));
+    
+    
+    // Methods ---------
+    
+    this.handleGhostTask = () => {
+      let ghostTask = !tag.ghostTask 
+        ? { key: new Date().getTime(), uid: tag.appStore.generateUidAction('todo') } 
+        : null;
+      tag.update({ ghostTask });
+    }
+  	
+  	this.handleTaskEdit = (key, field, value) => 
+  	  this.appStore.updateDataAction({ [field]: value }, [ 'todo', key ]);
+  	  
+  	this.handleTaskAdd = (key, data) => {
+  	  data.user = tag.user;
+  	  data.timestamp = key;
+  	  this.appStore.addDataAction(data, [ 'todo', key ], 0 - Date.now())
+  	}
+  	
+  	this.handleTaskRemove = (key) => 
+  	  tag.appStore.toggleModalAction(() => tag.appStore.removeDataAction([ 'todo', key ]));
+  	
+  </script>
+
+</todo>

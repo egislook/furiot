@@ -10,10 +10,10 @@
 		<!--<link rel="stylesheet" href="./style.css">-->
 		<!-- Styles --> 
 		<link rel="stylesheet" href="https://cdn.rawgit.com/noneedsystem/fuico/0.0.8/style.css">
-		<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Raleway:100,300,400,500" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
 	</head>
-	<body class="prim:lime800 sec:dorange err:red warn:yellow ff:Quicksand_all fw:300 fs:15px lg-fs:16px lh:1.3 bg:F1F1F1">
+	<body class="prim:292929 sec:dorange err:red ff:Raleway_h1,a ff:Open+Sans fw:300 fs:15px lg-fs:16px lh:1.3">
 		
 		<app></app>
 	  
@@ -21,15 +21,16 @@
 	  <!-- 
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/superagent/1.2.0/superagent.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
-		-->
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
-  	<script type="text/javascript" src="https://cdn.jsdelivr.net/riot/3.0.5/riot.min.js"></script>
+		-->
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
+  	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.0.7/riot.min.js"></script>
+  	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.0.7/riot+compiler.min.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/riot-route/3.0.2/route.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/riot/3.0.5/riot+compiler.js"></script>
 		<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
 		<!-- !!! comment before deploying -->
 		<!--<script src="https://cdn.rawgit.com/noneedsystem/fucss/0.6.4/fucss.min.js"></script>-->
-		<script src="../../fucss/fucss.js"></script>
+		<script src="../../../fucss/fucss.js"></script>
 		
 		<!-- experimental babel -->
 		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js"></script>
@@ -38,42 +39,34 @@
 		
 		
 		<!-- riot stores -->
-		<script type="text/javascript" src="./app/store/app.store.js"></script>
+		<script type="text/javascript" src="../app/store/app.store.js"></script>
 		<!-- element tags -->
-		<script type="riot/tag" data-src="./app/elem/btn.tag.html"></script>
-		<script type="riot/tag" data-src="./app/elem/raw.tag.html"></script>
-		<script type="riot/tag" data-src="./app/elem/toast.tag.html"></script>
-		<script type="riot/tag" data-src="./app/elem/modal.tag.html"></script>
-		<script type="riot/tag" data-src="./app/elem/editable-text.tag.html"></script>
-		<script type="riot/tag" data-src="./app/elem/navigation.tag.html"></script>
+		<script type="riot/tag" data-src="../app/elem/toast.tag.html"></script>
+		<script type="riot/tag" data-src="../app/elem/modal.tag.html"></script>
+		<script type="riot/tag" data-src="../app/elem/editable-text.tag.html"></script>
+		<script type="riot/tag" data-src="../app/elem/intro.tag.html"></script>
 		<!-- component tags -->
-		<script type="riot/tag" data-src="./app/comp/loading-screen.tag.html"></script>
-		<script type="riot/tag" data-src="./app/comp/task-tile.tag.html"></script>
+		<script type="riot/tag" data-src="../app/comp/loading-screen.tag.html"></script>
+		<script type="riot/tag" data-src="../app/comp/task-tile.tag.html"></script>
 		<!-- page tags -->
-		<script type="riot/tag" data-src="./app/page/todo.tag.html"></script>
-		<script type="riot/tag" data-src="./app/page/palette.tag.html"></script>
-		<script type="riot/tag" data-src="./app/page/empty.tag.html"></script>
+		<script type="riot/tag" data-src="../app/page/todo.tag.html"></script>
+		<script type="riot/tag" data-src="../app/page/palette.tag.html"></script>
+		<script type="riot/tag" data-src="../app/page/empty.tag.html"></script>
 		<!-- main tags -->
 		<script type="riot/tag" data-src="./app/app.tag.html"></script>
   	
   	<script>
   		// Initialize Firebase
-  		// let config = {
-  		//   apiKey: "AIzaSyBQ01AGchS9Pqx6jN-Dg8n_-4NQ78sXjKI",
-  		//   databaseURL: "https://todo-5fb17.firebaseio.com/",
-  		//   authDomain: "todo-5fb17.firebaseapp.com",
-  		// };
-  		
   		let config = {
-  		  apiKey: "AIzaSyD3KVvkOgLScspXOneySA40ZEaafpJoIpE",
-  		  databaseURL: "https://todo-58f44.firebaseio.com/",
-  		  authDomain: "todo-58f44.firebaseapp.com",
+  		  apiKey: "AIzaSyBQ01AGchS9Pqx6jN-Dg8n_-4NQ78sXjKI",
+  		  databaseURL: "https://todo-5fb17.firebaseio.com/",
+  		  authDomain: "todo-5fb17.firebaseapp.com",
   		};
   		
   		firebase.initializeApp(config);
   		
   		let stores = {
-  			appStore: new appStore(firebase)
+  			appStore: new appStore(firebase, { baseRef: 'example/'} )
   		};
   		
   		riot.mixin('Store', {
