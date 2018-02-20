@@ -1,0 +1,113 @@
+<app>
+  
+  <loading-screen if="{ !loaded }" />
+  
+  <main if="{ loaded }" class="">
+    
+    <nav class="ps:fx z:1 dp:flx jc:sb ai:c bg:prim c:white w:100pc p-rl:1pc t:0 l:0">
+      <a class="fw:700 m:0 fs:140pc tr:uc ls:5px p:10px" href="#">{ meta.title }</a>
+      <div class="ta:r m:0 c:white700 p:0-10px">
+        <span class="va:t fu-menu sm-dp:n fs:120pc" />
+        <div class="dp:n sm-dp:bk fs:70pc tr:uc ls:1px">
+          <a class="p:15px-20px" each="{ route in routes }" href="{ route.link }">{ route.title }</a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="p-t:50px w,h,lh:28px_i">
+      <div class="p:10px first-bg:indigo bg:silver m-b:10px" each="{ route in routes }" >
+        { route.name }
+        <i class="fu-cross"/>
+      </div>
+    </div>
+    
+    <intro intros="{ intros }" edit-mode="{ false }" class="h:600px m-t:100px mxw:1000px" default-style="{ true }" >
+       <div
+        each="{ intro, key in opts.intros }" 
+        style="background: linear-gradient( rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) ), url('{ intro.img }'); width: { screenWidth }px"
+        class="dp:flx ai:c h:100pc bg-sz:cv bg-ps:50pc fux-fadeIn fux-fadeOut fl:l"> asdas </div>
+    </intro>
+    
+    <section class="p-tb:60px mxw:850px bg:white">
+      <editable-text 
+    	  class="fw:300 fs:180pc ff:Raleway" 
+    	  cb-extras="{ { path: ['route', route.name] } }"
+    	  on-edit="{ handleDescEdit }" 
+    	  on-error="{ handleErrorToggle }"
+    	  text="{ about.title }" 
+    	  max="150"/>
+      <div class="m-tb:30px">
+      	<editable-text 
+      	  class="c:black100" 
+      	  cb-extras="{ { path: ['route', route.name] } }"
+      	  on-edit="{ handleDescEdit }" 
+      	  on-error="{ handleErrorToggle }"
+      	  text="{ about.desc }" 
+      	  max="150"/>
+    	</div>
+    </section>
+      
+    <div ref="page" />
+    
+    
+      
+    <toast msg="{ toastMessage }" on-remove="{ handleErrorToggle }" />
+    <modal if="{ modalShow }" on-action="{ handleModalToggle }" />
+    
+  </main>
+  
+  <script>
+    this.mixin('Store');
+  
+    var tag = this;
+    // store data
+    this.routes = {};
+    this.user = null;
+    this.route = false;
+    this.intros = {};
+    this.meta = {};
+    // inner data
+    this.loaded = false;
+    this.toastMessage = null;
+    this.modalShow = null;
+    
+    this.appStore.initApp();
+    this.appStore.on('ready', (data, state) => {
+      
+      window.route((collection, action, id) => {
+        this.appStore.setRouteAction(data.routes[collection || 'todo']);
+      });
+    	window.route.start(true);
+    	this.loaded = true;
+    	tag.update(state);
+    
+    });
+    this.appStore.on('data', (data, state) => tag.update(state));
+    this.appStore.on('user', (user) => tag.update({ user }));
+    this.appStore.on('route', (route) => {
+      //riot.mount(tag.refs.page, route.name);
+      //tag.update({ route });
+    });
+    
+    this.appStore.on('error', (toastMessage) => tag.update({ toastMessage }));
+    this.appStore.on('modal', (modalShow) => tag.update({ modalShow }))
+    
+    
+    // Methods ---------
+    
+    this.handleLogin = this.appStore.loginAction;
+    this.handleLogout = this.appStore.logoutAction;
+  	
+  	this.handleDescEdit = (desc, extras) => 
+  	  this.appStore.updateDataAction({desc}, extras.path);
+  	
+  	
+  	this.handleErrorToggle = (msg, size) => 
+  	  this.appStore.toggleErrorAction(msg, size);
+  	
+  	this.handleModalToggle = (actionOrConfirmation) => 
+  	  this.appStore.toggleModalAction(actionOrConfirmation)
+  	
+  </script>
+
+</app>

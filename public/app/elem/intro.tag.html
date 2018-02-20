@@ -1,0 +1,216 @@
+<intro>
+  <section class="{ opts.class } {
+      'ps:rel of:hd': !opts.noBasicClass,
+      'h:100vh w:100pc': !opts.class
+    }" ref="container">
+    <div  
+      class="{ 
+        'h:100pc': true, 
+        'fux-trans': !isSwiping
+      }"
+      style="width: { introContainerWidth }px; transform: translate({ moveX }px, 0px);"
+      onmouseleave="{ handleLeaveScreen }"
+      onmouseenter="{ stopIntroSwitching }"
+      onmousedown="{ handleToggleSwipe }"
+      ontouchstart="{ handleToggleSwipe }"
+      onmouseup="{ handleToggleSwipe }"
+      ontouchend="{ handleToggleSwipe }"
+      onmousemove="{ isSwiping && handleSwipeAction }"
+      ontouchmove="{ isSwiping && handleSwipeAction }">
+        
+        <yield if="{ !opts.defaultStyle }" />
+        <div
+        each="{ intro, key in opts.intros }" 
+        style="background: linear-gradient( rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) ), url('{ intro.img }'); width: { screenWidth }px"
+        class="dp:flx ai:c h:100pc bg-sz:cv bg-ps:50pc fux-fadeIn fux-fadeOut fl:l">
+          <div class="p-rl:2pc mxw:850px">
+            <editable-text 
+              edit-mode="{ parent.opts.editMode }"
+          	  class="fw:100 fs:150pc md-fs:200pc ff:Raleway" 
+          	  cb-extras="{ { path: ['route', route.name] } }"
+          	  on-edit="{ handleDescEdit }" 
+          	  on-error="{ handleErrorToggle }"
+          	  text="{ intro.title }" 
+          	  max="150"/>
+          	<div class="m-t:50px m-b:20px">
+          	  <editable-text 
+          	    edit-mode="{ parent.opts.editMode }"
+            	  class="mxw:400px c:black100 fs:90pc fr:uc fw:600 ls:2px" 
+            	  cb-extras="{ { path: ['route', route.name] } }"
+            	  on-edit="{ handleDescEdit }" 
+            	  on-error="{ handleErrorToggle }"
+            	  text="{ intro.phrase }" 
+            	  max="150"/>
+          	</div>
+          	<div class="m-b:50px m-t:20px">
+            	<editable-text 
+            	  edit-mode="{ parent.opts.editMode }"
+            	  class="mxw:400px c:black100" 
+            	  cb-extras="{ { path: ['route', route.name] } }"
+            	  on-edit="{ handleDescEdit }" 
+            	  on-error="{ handleErrorToggle }"
+            	  text="{ intro.desc }" 
+            	  max="150"/>
+          	</div>
+            <a if="{ intro.button }"
+              class="bg:sec p:15px-40px c:white tr:uc fs:75pc bd:2px-sld-sec fw:600 ls:1px fux-trans hv-bg:white hv-c:black" 
+              href="{ intro.button.link }">{ intro.button.title }</a>
+          </div>
+        </div>
+    
+    </div>
+    <div if="{ !opts.hideKeys }" class="ps:ab b:0 w:100pc ta:c">
+      <span class="lh:0">
+        <a 
+          class="p:20px-5px crs:pt"
+          each="{ intro, key in opts.intros }" 
+          onclick="{ handleNextIntro.bind(e, key) }">
+          <i class="{ 
+            'bd-tb:1px-sld-whitea7 w:35px m-rl:5px fux-trans': true,
+            'bd-c:white': key === showIntro
+          }"/>
+      </a>
+      <span if="{ opts.editMode }" class="bg:sec c:white p:10px fu-plus" />
+    </div>
+  </section>
+  
+  <script>
+    //ps:rel of:hd h:100vh w:100pc
+    //opts
+    this.opts.hideKeys = this.opts.hideKeys || false; //  hide-keys
+    this.opts.editMode = this.opts.editMode || false; //  edit-mode
+    this.opts.noBasicClass = this.opts.noBasicClass || false;
+    this.opts.class = this.opts.class || '';
+    this.opts.defaultStyle = this.opts.defaultStyle || true;
+    //rest
+    let tag = this;
+    this.keysOfIntros = Object.keys(this.opts.intros);
+    this.keyIndex = 0;
+    this.showIntro = this.keysOfIntros && this.keysOfIntros[this.keyIndex];
+    this.interval = null;
+    
+    // touch
+    this.isSwiping = null;
+    this.moveX = 0;
+    this.mouseStarted = 0;
+    this.swipeDelay = 16;
+    this.switchDelay = 5000;
+    
+    this.on('mount', () => {
+      let screenWidth = tag.refs.container.offsetWidth;
+      tag.update({ 
+        screenWidth, 
+        introContainerWidth: tag.keysOfIntros.length * screenWidth
+      });
+      tag.startIntroSwitching();
+    });
+    
+    this.startIntroSwitching = () => {
+      clearInterval(tag.interval);
+      tag.interval = setInterval(() => {
+        tag.keyIndex++;
+        if(tag.keyIndex >= tag.keysOfIntros.length){
+          tag.keyIndex = 0;
+        }
+        tag.showIntro = tag.keysOfIntros[tag.keyIndex];
+        tag.updateIntroPosition();
+        tag.update();
+      }, tag.switchDelay);
+    }
+    
+    this.stopIntroSwitching = () => {
+      clearInterval(tag.interval);
+      tag.update({ interval: null });
+    }
+    
+    this.handleLeaveScreen = () => {
+      tag.isSwiping && tag.updateIntroPosition();
+      tag.startIntroSwitching();
+    }
+    
+    this.handleNextIntro = (introKey, e) => {
+      tag.update({
+        keyIndex: tag.keysOfIntros.indexOf(introKey),
+        showIntro: introKey,
+      });
+      tag.updateIntroPosition();
+      tag.startIntroSwitching();
+    }
+    
+    this.handleToggleSwipe = (e) => {
+      //console.log('!!!!clicking or unclicking');
+      switch(e.type){
+        
+        case 'mousedown':
+        case 'touchstart':
+          tag.stopIntroSwitching();
+          tag.isSwiping = true;
+          tag.mouseStarted = {
+            x: e.pageX || e.changedTouches && e.changedTouches[0].pageX,
+            y: e.pageY || e.changedTouches && e.changedTouches[0].pageY
+          };
+        break;
+        
+        case 'mouseup':
+        case 'touchend':
+          tag.startIntroSwitching();
+          let moved = tag.moveX * -1;
+          if(moved > (tag.screenWidth * tag.keyIndex) + tag.screenWidth / 4 && tag.keyIndex < (this.keysOfIntros.length - 1)){
+            tag.keyIndex++;
+          } else if(moved < (tag.screenWidth * tag.keyIndex) - tag.screenWidth / 4 && tag.keyIndex > 0){
+            tag.keyIndex--;
+          }
+          tag.showIntro = tag.keysOfIntros[tag.keyIndex];
+          tag.updateIntroPosition();
+        break;
+      
+      }
+      
+    }
+    
+    this.on('update', (data) => {
+      if(!data) return;
+    })
+    
+    window.onscroll = _.throttle((e) => {
+      tag.isSwiping && tag.updateIntroPosition();
+    }, 100)
+    
+    window.onresize = _.throttle((e) => {
+      tag.update({ screenWidth: tag.refs.container.offsetWidth });
+      tag.updateIntroPosition();
+    }, 100)
+    
+    this.handleSwipeAction = _.throttle((e) => {
+      
+      if(tag.isSwiping){
+        let posX = e.pageX || e.changedTouches && e.changedTouches[0].pageX;
+        let posY = e.pageY || e.changedTouches && e.changedTouches[0].pageY;
+        let difX = posX - tag.mouseStarted.x;
+        let difY = posY - tag.mouseStarted.y;
+        let moveX = difX - (tag.screenWidth * tag.keyIndex);
+        let minDifX = tag.screenWidth/20;
+        let maxDifY = 200;
+        //(difX * -1) > minDifX || (difX * -1) < - minDifX
+        if((difY > maxDifY || difY < - maxDifY)){
+          tag.updateIntroPosition();
+        } else
+        if(tag.keyIndex === 0 && difX > 0){
+          difX/5 !== tag.moveX && tag.update({ moveX: difX/5 });
+        } else
+        if(tag.keyIndex === tag.keysOfIntros.length -1 && difX/5 < 0){
+          tag.update({ moveX: difX/5 + ( - tag.screenWidth * tag.keyIndex) });
+        } else
+        if(moveX !== tag.moveX){
+          tag.update({ moveX });
+        }
+      }
+    }, tag.swipeDelay)
+    
+    this.updateIntroPosition = () => {
+      let moveX = tag.screenWidth * tag.keyIndex * -1;
+      tag.update({ moveX, isSwiping: false });
+    }
+  </script>
+  
+</intro>

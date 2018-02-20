@@ -1,11 +1,14 @@
-<colors>
-  <div if="{false}" class="bg:white dp:flx flxw:wrp p:10px">
+<palette>
+  <div class="dp:flx flxw:wrp">
     <span 
       each="{ color, key in colors }" 
-      class="w:100pc sm-w:32pc m-b:10px fs:80pc c:white fw:400 p:10px_div ta:l">
+      class="w:100pc sm-w:32pc m-t:10px fs:80pc c:white fw:400 p:10px_div ta:l fux-boxsh bg:white p:5px">
       <div style="background-color: { color }">{ color } { key }</div>
-      <div class="fs:80pc" each="{ modifier, val in colorModifiers}" style="background-color: { generateColor(color, modifier) }">
-        { generateColor(color, modifier) } { key }{ val } 
+      <div
+        each="{ modifier, val in colorModifiers}"
+        class="fs:80pc fux-fadeIn"  
+        style="background-color: { generateColor(color, modifier) }">
+          { generateColor(color, modifier) } { key }{ val } 
       </div>
     </span>
   </div>
@@ -20,4 +23,4 @@
     
   </script>
   
-</colors>
+</palette>

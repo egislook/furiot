@@ -2,163 +2,80 @@
   
   <loading-screen if="{ !loaded }" />
   
-  <main if="{ loaded }" class="mxw:600px p-b:80px p-rl:2pc">
+  <main show="{ loaded }" class="mxw:600px p-b:80px p-rl:2pc">
     
     <navigation 
-      routes="{ data.route }" 
+      if="{ loaded }"
+      routes="{ routes }" 
       user="{ user }" 
       on-login="{ handleLogin }" 
       on-logout="{ handleLogout }"/>
-    
-    <div class="m-tb:30px">
+      
+    <div if="{ loaded }" class="m-tb:30px">
     	<editable-text 
     	  class="fw:200 fs:150pc dp:ib" 
+    	  cb-extras="{ { path: ['route', route.name] } }"
     	  on-edit="{ handleDescEdit }" 
     	  max="50"
     	  on-error="{ handleErrorToggle }"
-    	  text="{ data.meta.desc }" />
+    	  text="{ route.desc }" />
   	</div>
-    
-    <raw if="{ false }" html="{ data.meta.html }"/>
-    <div if="{ false }">
-      <input placeholder="wtf"/>
-  		<button>tadam</button>
-  		<textarea>
-  			asdasdasd
-  		</textarea>
-  		<a>link</a>
-    </div>
-    
-    <colors />
-    
-    <meta-data if="{ true }" />
-    
-    <task-tile 
-      if="{ !!ghostTask }"
-      desc-placeholder="{ data.phrase.needSomeTaskDesc }"
-      is-ghost="{ true }"
-      key="{ ghostTask.key }"
-      title-placeholder="{ data.phrase.needSomeTaskTitle }"
-      user-photo="{ user && user.photo }"
-      user-uid="{ user && user.uid }"
-      user-name="{ user && user.name }"
-      on-add="{ handleTaskAdd }"
-      on-edit="{ handleTaskEdit }"
-      on-error="{ handleErrorToggle }"
-      on-remove="{ handleGhostTask }" />
-    
-    <!-- parent is required to access data and methods in for each -->
-    <task-tile 
-      each="{ todo, key in data.todo }" 
-      desc="{ todo.desc }" 
-      desc-placeholder="{ parent.data.phrase.needSomeTaskDesc }"
-      key="{ key }"
-      title="{ todo.title }"
-      title-placeholder="{ parent.data.phrase.needSomeTaskTitle }"
-      timestamp="{ todo.timestamp }"
-      user-photo="{ todo.user && todo.user.photo }"
-      user-uid="{ todo.user && todo.user.uid }"
-      user-name="{ todo.user && todo.user.name }"
-      on-edit="{ parent.handleTaskEdit }"
-      on-error="{ parent.handleErrorToggle }"
-      on-remove="{ parent.handleTaskRemove }" />
-    
-    <button 
-      if="{ !ghostTask }"
-      class="ps:fx b:0 l,r:50pc p:20px fs:120pc bg:sec fux-boxsh c:white br:50pc lh:1 m:15px m-l:20npx fu-plus"
-      onclick="{ user && handleGhostTask || handleLogin }" />
+      
+    <div ref="page" />
       
     <toast msg="{ toastMessage }" on-remove="{ handleErrorToggle }" />
-    <modal if="{ !!modalAction }" on-action="{ handleModalActionToggle }" />
+    <modal if="{ modalShow }" on-action="{ handleModalToggle }" />
     
   </main>
   
   <script>
-    
-    // MUST HAVE this part. 
-    // it loads firebase data to this.data object or tag.data object
-    //--------------------------
-    let tag = this;
+    this.mixin('Store');
+  
+    var tag = this;
+    // store data
+    this.routes = {};
+    this.user = null;
+    this.route = false;
+    // inner data
     this.loaded = false;
-    this.data = {};
-    this.user = false;
-    this.db = this.opts.db;
-    this.auth = this.opts.auth;
-    
-    tag.db.ref().orderByChild('timestamp').on('value', (snapshot) => {
-      tag.loaded = true;
-  	  tag.data = snapshot.val();
-  	  
-  	  tag.update();
-  	  console.dir(tag.data);
-    }, tag.handleErrorToggle);
-    
-  	this.auth.onAuthStateChanged((user) => {
-  	  tag.user = user && {
-  	    name: user.displayName,
-  	    email: user.email,
-  	    photo: user.photoURL,
-  	    uid: user.uid
-  	  }
-  	  console.dir(tag.user);
-  	  tag.update();
-  	});
-    
-    //--------------------------
-    
-    
-    // Other stuff
     this.toastMessage = null;
-    this.modalAction = null;
-    this.ghostTask = null;
+    this.modalShow = null;
+    
+    this.appStore.initApp();
+    this.appStore.on('ready', (data) => {
+      
+      window.route((collection, action, id) => {
+        this.appStore.setRouteAction(data.routes[collection || 'todo']);
+      });
+    	window.route.start(true);
+    	tag.update({ loaded: true, routes: data.routes });
+    
+    });
+    this.appStore.on('data', (data) => tag.update(this.appStore.getData(['routes', 'route'])));
+    this.appStore.on('user', (user) => tag.update({ user }));
+    this.appStore.on('route', (route) => {
+      riot.mount(tag.refs.page, route.name);
+      tag.update({ route });
+    });
+    
+    this.appStore.on('error', (toastMessage) => tag.update({ toastMessage }));
+    this.appStore.on('modal', (modalShow) => tag.update({ modalShow }))
     
     
     // Methods ---------
     
-    this.handleLogin = () => tag.opts.signInWithRedirect();
-    this.handleLogout = () => tag.auth.signOut();
-    
-    this.handleGhostTask = () => {
-      tag.ghostTask = !tag.ghostTask 
-        ? { key: new Date().getTime(), uid: tag.db.ref('todo').push().key } : null;
-      tag.update();
-    }
+    this.handleLogin = this.appStore.loginAction;
+    this.handleLogout = this.appStore.logoutAction;
   	
-  	this.handleDescEdit = (desc) => 
-  	  tag.db.ref('meta/').update({desc}).catch(tag.handleErrorToggle);
+  	this.handleDescEdit = (desc, extras) => 
+  	  this.appStore.updateDataAction({desc}, extras.path);
   	
-  	this.handleTaskEdit = (key, field, value) => 
-  	  tag.db.ref('todo/' + key).update({[field]: value}).catch(tag.handleErrorToggle);
-  	  
-  	this.handleTaskAdd = (key, data) => {
-  	  data.user = tag.user;
-  	  data.timestamp = key;
-  	  tag.db.ref('todo/' + key).setWithPriority(data, 0 - Date.now()).catch(tag.handleErrorToggle);
-  	}
   	
-  	this.handleErrorToggle = (value, size) => {
-  	  tag.toastMessage = !tag.toastMessage 
-  	    ? size 
-  	      ? `'${value}' ${tag.data.phrase.incorrectInput} ${size.min} & ${size.max}`
-  	      : value
-  	    : null;
-  	  tag.update();
-  	}
+  	this.handleErrorToggle = (msg, size) => 
+  	  this.appStore.toggleErrorAction(msg, size);
   	
-  	this.handleModalActionToggle = (actionOrConfirmation) => {
-  	  if(typeof actionOrConfirmation === 'function'){
-  	    //sets confirmation action
-  	    tag.modalAction = actionOrConfirmation;
-  	  } else {
-    	  //confirms or denies the action
-    	  actionOrConfirmation && tag.modalAction();
-    	  tag.modalAction = null;
-  	  }
-  	  tag.update();
-  	}
-  	
-  	this.handleTaskRemove = (key) => 
-  	  tag.handleModalActionToggle(() => tag.db.ref('todo/' + key).remove().catch(tag.handleErrorToggle));
+  	this.handleModalToggle = (actionOrConfirmation) => 
+  	  this.appStore.toggleModalAction(actionOrConfirmation)
   	
   </script>
 

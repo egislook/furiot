@@ -4,10 +4,10 @@
     placeholder="{ placeholder }"
     contentEditable="{ opts.contentEditable || contentEditable }"
     class="{ opts.class } {
-      'ws:pl ww:nm bd-l:sd-1px-ts fc-bd-c:prim fc-p-l:5px ta:l' : !opts.noBasicClass,
-      'c:err fc-bd-c:err' : !isValid
+      'ws:pl ww:nm bd-l:sd-1px-ts fc-bd-c:prim fc-p-l:5px fux-trans' : !opts.noBasicClass,
+      'c:err fc-bd-c:err' : !isValid,
     }"
-    onclick="{ !contentEditable && handleSetEditable }"
+    onclick="{ opts.editMode && !contentEditable && handleSetEditable }"
     onblur="{ handleUpdateEditable }"
     onkeyup="{ handleTextLength }"
     onmouseup="{ opts.editorEnabled && handleDisplayEditor }">{ opts.text }</div>
@@ -29,6 +29,9 @@
   </div>
   
   <script>
+    // opts
+    this.opts.editMode = this.opts.editMode || true;
+    // other
     let tag = this;
     
     this.editor = null;
@@ -43,7 +46,7 @@
       ? this.opts.placeholder 
       : 'defaut placeholder';
       
-    this.contentEditable = this.placeholder && !this.opts.text 
+    this.contentEditable = this.opts.editMode && this.placeholder && !this.opts.text 
       ? 'plaintext-only' 
       : false;
       
